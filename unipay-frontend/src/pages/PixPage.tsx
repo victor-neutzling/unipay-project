@@ -1,4 +1,4 @@
-import type { ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { ArrowLeft, ArrowRight, Check, LockKeyhole, ShieldCheck } from "lucide-react";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { Brand } from "../components/Brand";
@@ -6,7 +6,6 @@ import type { PixRecipient } from "../api";
 import type { PixStep } from "../types";
 
 const formatMoney = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
 type PixPageProps = {
   step: PixStep;
   setStep: (step: PixStep) => void;
@@ -27,7 +26,10 @@ type PixPageProps = {
 export function PixPage(props: PixPageProps) {
   const { step, setStep, pixKey, setPixKey, recipient, setRecipient, amount, setAmount, error, busy, receipt, onLookup, onTransfer, onHome } = props;
   const numericAmount = Number(amount.replace(",", "."));
-  const goBack = () => step === "key" ? onHome() : setStep("key");
+  const goBack = () => {
+    if (step === "key") onHome();
+    else setStep("key");
+  };
   const updateAmount = (event: ChangeEvent<HTMLInputElement>) => setAmount(event.target.value.replace(/[^\d,.]/g, ""));
 
   return (
@@ -57,10 +59,10 @@ export function PixPage(props: PixPageProps) {
           <PrimaryButton id="pix-confirm" disabled={!numericAmount || busy} onClick={onTransfer}>{busy ? "Enviando…" : "Confirmar PIX"}</PrimaryButton>
           <div className="pix-trust"><LockKeyhole size={13} /> Confira o valor e destinatário antes de confirmar</div>
         </>}
-        {step === "done" && <div className="done-state">
+        {step === "done" && <div id="pix-transfer-success" className="done-state">
           <div className="done-check"><Check size={34} /></div><span className="step-label">PIX REALIZADO</span>
-          <h1>Pronto. Foi<br />rapidinho, né?</h1><p>Seu PIX de <strong>{formatMoney(numericAmount)}</strong> foi enviado.</p>
-          <div className="receipt"><span>DESTINATÁRIO<strong>{pixKey}</strong></span><span>VALOR<strong>{formatMoney(numericAmount)}</strong></span><span>COMPROVANTE<strong>{receipt}</strong></span><span>STATUS<strong className="receipt-status">Concluído</strong></span></div>
+          <h1>Pronto. Foi<br />rapidinho, né?</h1><p>Seu PIX de <strong id="pix-success-amount">{formatMoney(numericAmount)}</strong> foi enviado.</p>
+          <div className="receipt"><span>DESTINATÁRIO<strong id="pix-success-recipient">{pixKey}</strong></span><span>VALOR<strong>{formatMoney(numericAmount)}</strong></span><span>COMPROVANTE<strong>{receipt}</strong></span><span>STATUS<strong className="receipt-status">Concluído</strong></span></div>
           <PrimaryButton id="pix-finish" onClick={onHome}>Voltar para o início</PrimaryButton>
         </div>}
       </div>

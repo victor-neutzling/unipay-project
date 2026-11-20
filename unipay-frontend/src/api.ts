@@ -14,6 +14,8 @@ export type Transaction = {
   date: string;
   amount: number;
   kind: "in" | "out";
+  counterpartyCpf?: string | null;
+  counterpartyPixKey?: string | null;
 };
 
 export type PixRecipient = { name: string; pixKey: string };
@@ -65,6 +67,10 @@ export const api = {
   async getAccount(): Promise<User> {
     const result = await request<{ user: User }>("/account");
     return result.user;
+  },
+
+  async deposit(amount: number): Promise<{ balance: number }> {
+    return request("/account/deposit", { method: "POST", body: JSON.stringify({ amount }) });
   },
 
   async getTransactions(): Promise<Transaction[]> {

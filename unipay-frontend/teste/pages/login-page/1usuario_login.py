@@ -9,21 +9,23 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from fixos import EMAIL_TESTE, SENHA_TESTE
 
 def capturar_tela(navegador, resultado):
-    # Identifica a pasta onde está o arquivo test_login.py
-    pasta_raiz = Path(__file__).resolve().parent
+    # Aqui fica a pasta das prints desse teste.
+    pasta_raiz = Path(__file__).resolve().parents[2] / "screenshots" / "1usuario_login"
+    pasta_raiz.mkdir(parents=True, exist_ok=True)
 
-    # Obtém a data e a hora da execução
+    # Pego a data e a hora pra não repetir o nome da print.
     data_hora = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    # Salva a imagem diretamente na pasta do teste
+    # Salvo a print nessa pasta.
     caminho_imagem = (
         pasta_raiz
-        / f"login_{resultado}_{data_hora}.png"
+        / f"1usuario_login_{resultado}_{data_hora}.png"
     )
 
-    # Captura a tela e informa se a operação funcionou
+    # Tiro uma print pra mostrar o resultado.
     imagem_salva = navegador.save_screenshot(
         str(caminho_imagem)
     )
@@ -36,40 +38,46 @@ def capturar_tela(navegador, resultado):
 
 def test_login_com_sucesso():
     service = Service(log_output="chromedriver.log", service_args=["--verbose"])
-    navegador = webdriver.Chrome(service = service)
+    opcoes = webdriver.ChromeOptions()
+    opcoes.add_experimental_option("prefs", {
+        "credentials_enable_service": False,
+        "profile.password_manager_enabled": False,
+        "profile.password_manager_leak_detection": False,
+    })
+    navegador = webdriver.Chrome(service=service, options=opcoes)
 
     try:
         navegador.maximize_window()
 
-        # Acessa a página
+        # Abro o UniPay.
         navegador.get("http://localhost:8080/")
         time.sleep(2)
 
-        # Preenche o usuário
+        # Coloco o e-mail da conta de teste.
         campo_usuario = navegador.find_element(
             By.ID,
 
             "login-email"
         )
-        campo_usuario.send_keys("teste@gmail.com")
+        campo_usuario.send_keys(EMAIL_TESTE)
         time.sleep(2)
 
-        # Preenche a senha
+        # Coloco a senha da conta de teste.
         campo_senha = navegador.find_element(
             By.ID,
             "login-password"
         )
-        campo_senha.send_keys("teste_password")
+        campo_senha.send_keys(SENHA_TESTE)
         time.sleep(2)
 
-        # Clica no botão de login
+        # Clico pra entrar na conta.
         botao_login = navegador.find_element(
             By.ID,
             "login-submit"
         )
         botao_login.click()
 
-        # Aguarda a página do menu
+        # Espero o menu aparecer depois do login.
         titulo_menu = WebDriverWait(
             navegador,
             10
@@ -79,22 +87,21 @@ def test_login_com_sucesso():
             )
         )
 
-        # Valida o resultado
+        # Confiro se o resultado apareceu certo.
         assert titulo_menu.text == "MENU"
 
-        # Captura a evidência de sucesso
+        # Salvo a print do resultado.
         capturar_tela(navegador, "sucesso")
 
     except Exception:
-        # Captura a evidência de falha
+        # Se der erro, também salvo uma print.
         capturar_tela(navegador, "falha")
 
-        # Informa a falha ao pytest
+        # Deixo o pytest mostrar o erro.
         raise
 
     finally:
-        # Executado antes de fechar o navegador,
-        # independentemente do resultado do teste
+        # Fecho o navegador mesmo se o teste der erro.
         print("\nO navegador será fechado em 5 segundos...")
         time.sleep(5)
 

@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { pool } from "./db.js";
+import { ensureCounterpartySchema, pool } from "./db.js";
 import { requireAuth } from "./auth.js";
 import { HttpError } from "./http.js";
 import { accountRoutes } from "./routes/accountRoutes.js";
@@ -50,11 +50,26 @@ app.use((error, _request, response, _next) => {
   return response.status(500).json({ error: "Ocorreu um erro interno. Tente novamente." });
 });
 
-const server = app.listen(port, "0.0.0.0", () => {
-  console.log(`UniPay API pronta na porta ${port}.`);
+let server;
+
+async function start() {
+  await ensureCounterpartySchema();
+  server = app.listen(port, "0.0.0.0", () => {
+    console.log(`UniPay API pronta na porta ${port}.`);
+  });
+}
+
+start().catch((error) => {
+  console.error("Não foi possível preparar o banco do UniPay.", error);
+  process.exit(1);
 });
 
 async function shutdown() {
+  if (!server) {
+    await pool.end();
+    process.exit(0);
+    return;
+  }
   server.close(async () => {
     await pool.end();
     process.exit(0);

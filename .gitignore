@@ -1,0 +1,3 @@
+# Evidências e logs gerados pelos testes Selenium
+chromedriver.log
+unipay-frontend/teste/screenshots/**/*.png

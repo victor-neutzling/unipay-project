@@ -34,7 +34,7 @@ export function RegisterPage({ onRegister, onBack, name, setName, email, setEmai
           <TextField id="register-email" label="E-mail" type="email" placeholder="voce@email.com" value={email} onChange={setEmail} required />
           <label htmlFor="register-cpf">CPF</label>
           <input id="register-cpf" type="text" inputMode="numeric" autoComplete="off" placeholder="Somente números" value={cpf} onChange={(event) => setCpf(event.target.value.replace(/\D/g, "").slice(0, 11))} required minLength={11} maxLength={11} />
-          <TextField id="register-password" label="Crie sua senha" type="password" placeholder="Mínimo de 8 caracteres" value={password} onChange={setPassword} required minLength={8} />
+          <TextField id="register-password" label="Crie sua senha" type="password" placeholder="Mín. 8 caracteres (limite de 72 bytes)" value={password} onChange={setPassword} required minLength={8} maxLength={72} />
           <div className="pix-notice"><span className="pix-icon">✳</span><span><strong>Sua chave PIX será criada no cadastro</strong><small>Vamos usar seu e-mail como chave PIX.</small></span></div>
           {error && <p className="error-msg" role="alert">{error}</p>}
           <PrimaryButton id="register-submit" type="submit" disabled={busy}>{busy ? "Criando conta…" : "Criar minha conta"}</PrimaryButton>

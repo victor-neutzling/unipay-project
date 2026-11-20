@@ -38,7 +38,6 @@ export default function App() {
         }
       })
       .catch((sessionError: Error) => {
-        api.clearSession();
         if (active) setError(sessionError.message);
       })
       .finally(() => {

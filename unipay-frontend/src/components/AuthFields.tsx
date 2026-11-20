@@ -10,9 +10,10 @@ type TextFieldProps = {
   onChange: (value: string) => void;
   required?: boolean;
   minLength?: number;
+  maxLength?: number;
 };
 
-export function TextField({ id, label, type = "text", placeholder, value, onChange, required = false, minLength }: TextFieldProps) {
+export function TextField({ id, label, type = "text", placeholder, value, onChange, required = false, minLength, maxLength }: TextFieldProps) {
   return (
     <>
       <label htmlFor={id}>{label}</label>
@@ -24,6 +25,7 @@ export function TextField({ id, label, type = "text", placeholder, value, onChan
         onChange={(event) => onChange(event.target.value)}
         required={required}
         minLength={minLength}
+        maxLength={maxLength}
       />
     </>
   );

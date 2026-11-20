@@ -18,18 +18,19 @@ function publicUser(row) {
 }
 
 authRoutes.post("/register", asyncRoute(async (request, response) => {
-  const name = String(request.body.name ?? "").trim();
-  const email = normalizePixKey(request.body.email);
-  const cpf = String(request.body.cpf ?? "").replace(/\D/g, "");
-  const password = String(request.body.password ?? "");
+  const body = request.body ?? {};
+  const name = String(body.name ?? "").trim();
+  const email = normalizePixKey(body.email);
+  const cpf = String(body.cpf ?? "").replace(/\D/g, "");
+  const password = String(body.password ?? "");
 
   if (!name || name.length > 255) throw new HttpError(400, "Informe seu nome completo.");
   if (email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw new HttpError(400, "Informe um e-mail válido.");
   }
   if (!validateCpf(cpf)) throw new HttpError(400, "Informe um CPF válido.");
-  if (password.length < 8 || password.length > 128) {
-    throw new HttpError(400, "A senha deve ter entre 8 e 128 caracteres.");
+  if (password.length < 8 || bcrypt.truncates(password)) {
+    throw new HttpError(400, "A senha deve ter pelo menos 8 caracteres e no máximo 72 bytes em UTF-8.");
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -50,8 +51,9 @@ authRoutes.post("/register", asyncRoute(async (request, response) => {
 }));
 
 authRoutes.post("/login", asyncRoute(async (request, response) => {
-  const email = normalizePixKey(request.body.email);
-  const password = String(request.body.password ?? "");
+  const body = request.body ?? {};
+  const email = normalizePixKey(body.email);
+  const password = String(body.password ?? "");
   if (!email || !password) throw new HttpError(400, "Informe seu e-mail e sua senha.");
 
   const [rows] = await pool.execute(

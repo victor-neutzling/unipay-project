@@ -43,7 +43,8 @@ CREATE TABLE IF NOT EXISTS pix_recente (
 
 CREATE TABLE IF NOT EXISTS contraparte (
   idContraparte INT PRIMARY KEY AUTO_INCREMENT,
-  nome VARCHAR(30) NOT NULL,
+  nome VARCHAR(255) NOT NULL,
+  cpf VARCHAR(11) NULL,
   idUsuario INT NULL,
   tipo VARCHAR(30) NOT NULL,
   FOREIGN KEY (idUsuario) REFERENCES usuario (idUsuario)

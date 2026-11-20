@@ -638,6 +638,20 @@ button:disabled {
   color:#89958d;
   margin-top:4px
 }
+.deposit-form {
+  margin:-15px 0 30px;
+  padding:16px;
+  border:1px solid #e5eae4;
+  border-radius:8px;
+  background:#fff
+}
+.deposit-form label { display:block; margin-bottom:9px; color:#30463a; font-size:11px; font-weight:600 }
+.deposit-controls { display:flex; align-items:center; gap:10px }
+.deposit-controls>span { color:#75847a; font-size:12px; font-weight:700 }
+.deposit-controls input { width:100%; min-width:0; height:40px; border:1px solid #dfe5df; border-radius:6px; padding:0 10px; outline:0 }
+.deposit-controls input:focus { border-color:#4a9567 }
+.deposit-controls button { height:40px; border:0; border-radius:6px; padding:0 16px; background:#174d3b; color:#fff; font-size:11px; font-weight:600; white-space:nowrap }
+.deposit-form .error-msg { margin-bottom:0 }
 .quick-icon {
   width:36px;
   height:36px;

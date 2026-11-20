@@ -36,4 +36,4 @@ Account and PIX routes require `Authorization: Bearer <token>`. Passwords are ha
 
 The schema follows the supplied tables. It widens `usuario.senha` to hold a bcrypt hash, requires and uniquely indexes email and CPF, and makes the account's email PIX key unique. PIX transfers are recorded as an outgoing entry for the sender and an incoming entry for the recipient inside one MySQL transaction.
 
-MySQL runs the scripts in `db/init/` only when it initializes an empty data volume. After changing the schema, use a fresh local volume (`docker compose down -v`) to replay them; this erases local demo data.
+MySQL loads the schema from `database.sql` and the initial data from `db/init/02-seed.sql` only when it initializes an empty data volume. The API also applies compatibility changes for the counterparty CPF and name columns at startup. After changing the initialization schema, use a fresh local volume (`docker compose down -v`) to replay it; this erases local demo data.
