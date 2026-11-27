@@ -82,12 +82,16 @@ pixRoutes.post("/transfers", asyncRoute(async (request, response) => {
     }
 
     const [debitResult] = await connection.execute(
-  "UPDATE usuario SET saldo = saldo - ? WHERE idUsuario = ? AND saldo >= ?",
-  [amount.toFixed(2), request.userId, amount.toFixed(2)],
-);
-if (debitResult.affectedRows !== 1) {
-  throw new HttpError(409, "Saldo insuficiente para realizar o PIX.");
-}
+      "UPDATE usuario SET saldo = saldo - ? WHERE idUsuario = ? AND saldo >= ?",
+      [amount.toFixed(2), request.userId, amount.toFixed(2)],
+    );
+    if (debitResult.affectedRows !== 1) {
+      throw new HttpError(409, "Saldo insuficiente para realizar o PIX.");
+    }
+    await connection.execute(
+      "UPDATE usuario SET saldo = saldo + ? WHERE idUsuario = ?",
+      [amount.toFixed(2), recipient.idUsuario],
+    );
 
     const [outgoingCounterparty] = await connection.execute(
       "INSERT INTO contraparte (nome, cpf, idUsuario, tipo) VALUES (?, ?, ?, 'pix')",
