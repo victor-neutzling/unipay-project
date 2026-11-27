@@ -6,7 +6,7 @@ export const pixRoutes = Router();
 
 pixRoutes.get("/lookup", asyncRoute(async (request, response) => {
   const key = normalizePixKey(request.query.key);
-  if (!key || key.length > 60) throw new HttpError(400, "Informe uma chave PIX válida.");
+  if (!key || key.length > 255) throw new HttpError(400, "Informe uma chave PIX válida.");
 
   const [rows] = await pool.execute(
     `SELECT u.nome, cp.chavePix
@@ -37,9 +37,9 @@ pixRoutes.get("/recent", asyncRoute(async (request, response) => {
 pixRoutes.post("/transfers", asyncRoute(async (request, response) => {
   const body = request.body ?? {};
   const pixKey = normalizePixKey(body.pixKey);
-  const amount = Number(body.amount);
-  if (!pixKey || pixKey.length > 60) throw new HttpError(400, "Informe uma chave PIX válida.");
-  if (!Number.isFinite(amount) || amount <= 0 || Math.round(amount * 100) / 100 !== amount || !Number.isSafeInteger(Math.round(amount * 100))) {
+  const amount = body.amount;
+  if (!pixKey || pixKey.length > 255) throw new HttpError(400, "Informe uma chave PIX válida.");
+  if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0 || Math.round(amount * 100) / 100 !== amount || !Number.isSafeInteger(Math.round(amount * 100))) {
     throw new HttpError(400, "Informe um valor válido para o PIX.");
   }
 
@@ -85,7 +85,9 @@ pixRoutes.post("/transfers", asyncRoute(async (request, response) => {
       "UPDATE usuario SET saldo = saldo - ? WHERE idUsuario = ? AND saldo >= ?",
       [amount.toFixed(2), request.userId, amount.toFixed(2)],
     );
-    if (debitResult.affectedRows !== 1) throw new HttpError(409, "Saldo insuficiente para realizar o PIX.");
+    if (debitResult.affectedRows !== 1) {
+      throw new HttpError(409, "Saldo insuficiente para realizar o PIX.");
+    }
     await connection.execute(
       "UPDATE usuario SET saldo = saldo + ? WHERE idUsuario = ?",
       [amount.toFixed(2), recipient.idUsuario],

@@ -29,8 +29,8 @@ accountRoutes.get("/", asyncRoute(async (request, response) => {
 }));
 
 accountRoutes.post("/deposit", asyncRoute(async (request, response) => {
-  const amount = Number(request.body?.amount);
-  if (!Number.isFinite(amount) || amount <= 0 || Math.round(amount * 100) / 100 !== amount || !Number.isSafeInteger(Math.round(amount * 100))) {
+  const amount = request.body?.amount;
+  if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0 || Math.round(amount * 100) / 100 !== amount || !Number.isSafeInteger(Math.round(amount * 100))) {
     throw new HttpError(400, "Informe um valor válido para o depósito.");
   }
 
